@@ -75,7 +75,7 @@ function startGame() {
 
     // Disable the restart button
     restartButton.disabled = true;
-  }, 10000);
+  }, 100000);
 }
 
 function getBoxFromPoints(points) {
@@ -163,7 +163,6 @@ async function startSmileDetection() {
       
       // Setting zIndex to ensure canvas is above the video
       canvas.style.zIndex = 1;
-      
       if (!intervalStarted) {
         intervalStarted = true;
         setInterval(async () => {
@@ -181,7 +180,8 @@ async function startSmileDetection() {
             faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
 
             //change here
-            for (const face of detections) {
+            //for (const face of detections) {
+            for (const face of resizedDetections) {
               const features = {
                 jaw: face.landmarks.positions.slice(0, 17),
                 eyebrowLeft: face.landmarks.positions.slice(17, 22),
@@ -190,12 +190,15 @@ async function startSmileDetection() {
                 nose: face.landmarks.positions.slice(31, 36),
                 eyeLeft: face.landmarks.positions.slice(36, 42),
                 eyeRight: face.landmarks.positions.slice(42, 48),
+                eyes: face.landmarks.positions.slice(36, 48),
                 lipOuter: face.landmarks.positions.slice(48, 60),
                 lipInner: face.landmarks.positions.slice(60),
+                wholeface: face.landmarks.positions.slice(0, 27),
               }
-              for (const eye of [features.eyeLeft, features.eyeRight]) {
-                const eyeBox = getBoxFromPoints(eye);
-                const fontSize = 6 * eyeBox.height;
+              //for (const eye of [features.eyeLeft, features.eyeRight]) {
+              for (const facepoint of [features.wholeface]) {
+                const faceBox = getBoxFromPoints(facepoint);
+                //const fontSize = 6 * eyeBox.height;
 
                 //context.font = `${fontSize}px/${fontSize}px serif`;
                 //context.textDrawingMode = "glyph"
@@ -205,42 +208,27 @@ async function startSmileDetection() {
                   //context.fillText(emoji, eyeBox.center.x, eyeBox.center.y + 0.6 * fontSize);
                 //
                  // });
+                if (resizedDetections.length >= 1) {
+                  if (resizedDetections[0].expressions.happy > 0.7) {
+                    var imgObj = new Image();
+                    //imgObj.src = 'https://png.pngtree.com/png-vector/20220602/ourmid/pngtree-black-sunglass-vector-on-transparent-background-png-image_4764419.png'
+                    imgObj.src = 'sunglass.png'
 
-                var imgObj = new Image();
-                //imgObj.src = 'https://png.pngtree.com/png-vector/20220602/ourmid/pngtree-black-sunglass-vector-on-transparent-background-png-image_4764419.png'
-                imgObj.src = 'sunglass.png'
+                    imgObj.onload = function () {
+                      //var ctx = cvs.getContext('2d');
+                      const {x, y, width, height} = face.detection.box;
 
-                imgObj.onload = function() {
-                  //var ctx = cvs.getContext('2d');
-                  const {x, y, width, height} = face.detection.box;
+                      //context.drawImage(this, x- width*(1/2), y, width, 100);
+                      context.drawImage(this, faceBox.left, faceBox.top, width, 100)
 
-                  context.drawImage(this, x- width*(1/2), y, width, 100);
+                      //context.textAlign = 'center';
+                      //context.textBaseline = 'bottom';
 
-                  //context.textAlign = 'center';
-                  //context.textBaseline = 'bottom';
-
-                  //context.fillStyle = '#000';
-                  //context.fillText('😊', eyeBox.center.x, eyeBox.center.y + 0.6 * fontSize);
+                      //context.fillStyle = '#000';
+                      //context.fillText('😊', eyeBox.center.x, eyeBox.center.y + 0.6 * fontSize);
+                    }
+                  }
                 }
-              }
-
-              var imgObj2 = new Image();
-              //imgObj.src = 'https://png.pngtree.com/png-vector/20220602/ourmid/pngtree-black-sunglass-vector-on-transparent-background-png-image_4764419.png'
-              imgObj.src = 'sunglass.png'
-
-              imgObj.onload = function() {
-
-
-                imgObj.width = 200;
-                imgObj.height = 150;
-                context.drawImage(img, 0, 0, imgObj.width, imgObj.height);
-
-                //var ctx = cvs.getContext('2d');
-                //width = eyeBox.width *2
-                //height = eyeBox.height
-                //context.drawImage(this, eyeBox.center.x, eyeBox.center.y);
-                //ctx.drawImage(this, 0, 0,1024,768);//改变图片的大小到1024*768
-                //context.drawImage(this, eyeBox.center.x, eyeBox.center.y, 3,1);
               }
             }
 
