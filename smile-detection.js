@@ -125,6 +125,9 @@ async function startSmileDetection() {
       .getUserMedia({ video: true })
       .then((stream) => {
         video.srcObject = stream;
+        video.autoplay = true
+        video.muted = true
+        video.playsInline = true
 
         // Enable the start button after webcam access is granted
         startButton.disabled = false;
@@ -216,7 +219,7 @@ async function startSmileDetection() {
 
                       //context.drawImage(this, x- width*(1/2), y, width, 100);
                       canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-                      context.drawImage(this, faceBox.left, faceBox.top, width, 100)
+                      context.drawImage(this, faceBox.left, faceBox.top, width, height/2)
                       faceapi.draw.drawDetections(canvas, resizedDetections);
                       faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
 
