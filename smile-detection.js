@@ -125,9 +125,9 @@ async function startSmileDetection() {
       .getUserMedia({ video: true })
       .then((stream) => {
         video.srcObject = stream;
-        video.setAttribute('autoplay', '');
-        video.setAttribute('muted', '');
-        video.setAttribute('playsinline', '')
+        video.autoplay = true
+        video.muted = true
+        video.playsInline = true
 
         // Enable the start button after webcam access is granted
         startButton.disabled = false;
