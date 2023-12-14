@@ -38,11 +38,11 @@ function startGame() {
   // Update the smile counters display
   smileCounterElement1.textContent = `Person 1 Smiles: ${smileCounter1}`;
   smileCounterElement2.textContent = `Person 2 Smiles: ${smileCounter2}`;
-  
+
   // Hide popup and play again button
   popup.style.display = "none";
   playAgainButton.style.display = "none";
-  
+
   // Indicate that the game has started
   gameStarted = true;
 
@@ -125,6 +125,9 @@ async function startSmileDetection() {
       .getUserMedia({ video: true })
       .then((stream) => {
         video.srcObject = stream;
+        video.setAttribute('autoplay', '');
+        video.setAttribute('muted', '');
+        video.setAttribute('playsinline', '')
 
         // Enable the start button after webcam access is granted
         startButton.disabled = false;
@@ -157,10 +160,10 @@ async function startSmileDetection() {
 
       // Set canvas position to absolute
       canvas.style.position = 'absolute';
-      
+
       const displaySize = { width: video.offsetWidth, height: video.offsetHeight };
       faceapi.matchDimensions(canvas, displaySize);
-      
+
       // Setting zIndex to ensure canvas is above the video
       canvas.style.zIndex = 1;
       if (!intervalStarted) {
@@ -175,9 +178,6 @@ async function startSmileDetection() {
               detections,
               displaySize
             );
-            canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-            faceapi.draw.drawDetections(canvas, resizedDetections);
-            faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
 
             //change here
             //for (const face of detections) {
@@ -210,23 +210,31 @@ async function startSmileDetection() {
                  // });
                 if (resizedDetections.length >= 1) {
                   if (resizedDetections[0].expressions.happy > 0.7) {
-                    var imgObj = new Image();
-                    //imgObj.src = 'https://png.pngtree.com/png-vector/20220602/ourmid/pngtree-black-sunglass-vector-on-transparent-background-png-image_4764419.png'
-                    imgObj.src = 'sunglass.png'
 
+
+                    var imgObj = new Image();
                     imgObj.onload = function () {
                       //var ctx = cvs.getContext('2d');
                       const {x, y, width, height} = face.detection.box;
 
                       //context.drawImage(this, x- width*(1/2), y, width, 100);
+                      canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
                       context.drawImage(this, faceBox.left, faceBox.top, width, 100)
+                      faceapi.draw.drawDetections(canvas, resizedDetections);
+                      faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
 
                       //context.textAlign = 'center';
                       //context.textBaseline = 'bottom';
 
                       //context.fillStyle = '#000';
                       //context.fillText('😊', eyeBox.center.x, eyeBox.center.y + 0.6 * fontSize);
-                    }
+                    };
+                    imgObj.src = 'sunglass.png'
+                  }
+                  else{
+                    canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+                    faceapi.draw.drawDetections(canvas, resizedDetections);
+                    faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
                   }
                 }
               }
